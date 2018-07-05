@@ -1,63 +1,45 @@
 version: '3.0'
 services:
-  config:
-    environment:
-      CONFIG_SERVICE_PASSWORD: admin@1
-    image: config-service
-    restart: always
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
+    config-service:
+        environment:
+            CONFIG_SERVICE_PASSWORD: admin@1
+        build: config
+        ports:
+            - 8888:8888
+        restart: always
+  
+    discovery-service:
+        build: discovery
+        ports:
+            - 4000:4000
+        restart: always        
 
-  registry:
-    environment:
-    image: registry-service
-    restart: always
-    ports:
-      - 1901:1901
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
+    add-service:
+        environment:
+            CONFIG_SERVICE_PASSWORD: admin@1
+        build: add
+        depends_on:
+            - config-service            
+        ports:
+            - 4001:4001
+        restart: always                
 
-  gateway:
-    environment:
-      CONFIG_SERVICE_PASSWORD: admin@1
-    image: proxy-service
-    restart: always
-    depends_on:
-      config:
-        condition: service_healthy
-    ports:
-      - 1800:1800
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
+    multi-service:
+        environment:
+            CONFIG_SERVICE_PASSWORD: admin@1
+        build: multi
+        depends_on:
+            - config-service            
+        ports:
+            - 4002:4002
+        restart: always                
 
-  addservice:
-    environment:
-      CONFIG_SERVICE_PASSWORD: admin@1
-    image: addservice
-    restart: always
-    depends_on:
-      config:
-        condition: service_healthy
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-
-  multiplyservice:
-    environment:
-      CONFIG_SERVICE_PASSWORD: admin@1
-    image: multiservice
-    restart: always
-    depends_on:
-      config:
-        condition: service_healthy
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
+    gateway:
+        environment:
+            CONFIG_SERVICE_PASSWORD: admin@1
+        build: proxy
+        depends_on:
+            - config-service            
+        ports:
+            - 5000:5000
+        restart: always                

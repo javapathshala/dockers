@@ -1,0 +1,63 @@
+version: '3.0'
+services:
+  config:
+    environment:
+      CONFIG_SERVICE_PASSWORD: admin@1
+    image: config
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+
+  registry:
+    environment:
+    image: discovery
+    restart: always
+    ports:
+      - 4000:4000
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+
+  gateway:
+    environment:
+      CONFIG_SERVICE_PASSWORD: admin@1
+    image: proxy
+    restart: always
+    depends_on:
+      config:
+        condition: service_healthy
+    ports:
+      - 5000:5000
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+
+  addservice:
+    environment:
+      CONFIG_SERVICE_PASSWORD: admin@1
+    image: add
+    restart: always
+    depends_on:
+      config:
+        condition: service_healthy
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+
+  multiplyservice:
+    environment:
+      CONFIG_SERVICE_PASSWORD: admin@1
+    image: multi
+    restart: always
+    depends_on:
+      config:
+        condition: service_healthy
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
