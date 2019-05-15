@@ -3,4 +3,6 @@ MAINTAINER  JavaPathshala.com <java.pathshala@gmail.com>
 VOLUME /opt/tomcat/
 ADD /jp-config.jar jp-config.jar
 EXPOSE 8888:8888
-ENTRYPOINT ["java","-Dspring.profiles.active=native,dev","-jar","jp-config.jar"]
+ENTRYPOINT ["java","-Dspring.profiles.active=dev", "-jar","jp-config.jar"]
+VOLUME home/dimit/Selfie/JP/Repos/dev-repo
+VOLUME /app-logs/jp-config

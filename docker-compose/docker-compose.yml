@@ -1,45 +1,46 @@
-version: '3.0'
+version: '3.6'
 services:
-    config-service:
-        environment:
-            CONFIG_SERVICE_PASSWORD: admin@1
-        build: config
+    config:
+        build:
+            context: ./config
+            dockerfile: Dockerfile
+        image: config:1.0
+        container_name: "config"
+        networks:
+            - jp_network
         ports:
             - 8888:8888
+        hostname: config
+
+    discovery:
+        build:
+            context: ./discovery
+            dockerfile: Dockerfile
+        image: discovery:1.0
+        container_name: "discovery"
+        networks:
+            - jp_network
         restart: always
-  
-    discovery-service:
-        build: discovery
         ports:
             - 4000:4000
-        restart: always        
+        hostname: discovery
 
-    add-service:
-        environment:
-            CONFIG_SERVICE_PASSWORD: admin@1
-        build: add
-        depends_on:
-            - config-service            
-        ports:
-            - 4001:4001
-        restart: always                
-
-    multi-service:
-        environment:
-            CONFIG_SERVICE_PASSWORD: admin@1
-        build: multi
-        depends_on:
-            - config-service            
-        ports:
-            - 4002:4002
-        restart: always                
-
-    gateway:
-        environment:
-            CONFIG_SERVICE_PASSWORD: admin@1
-        build: proxy
-        depends_on:
-            - config-service            
+    proxy:
+        build:
+            context: ./proxy
+            dockerfile: Dockerfile
+        image: proxy:1.0
+        container_name: "proxy"
+        restart: always
+        networks:
+            - jp_network
         ports:
             - 5000:5000
-        restart: always                
+        depends_on:
+            - "config"
+            - "discovery"
+        hostname: proxy
+
+networks:
+    jp_network:
+        name: jp_network
