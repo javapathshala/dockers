@@ -20,7 +20,7 @@ services:
         container_name: "discovery"
         networks:
             - jp_network
-        restart: always
+        restart: on-failure
         ports:
             - 4000:4000
         hostname: discovery
@@ -31,7 +31,7 @@ services:
             dockerfile: Dockerfile
         image: proxy:1.0
         container_name: "proxy"
-        restart: always
+        restart: on-failure
         networks:
             - jp_network
         ports:
@@ -41,6 +41,27 @@ services:
             - "discovery"
         hostname: proxy
 
+    add:
+        build:
+            context: ./add
+            dockerfile: Dockerfile
+        image: add:1.0
+        container_name: "add"
+        restart: on-failure
+        networks:
+            - jp_network
+        ports:
+            - 4001:4001
+        depends_on:
+            - "config"
+            - "discovery"
+            - "proxy"
+        hostname: add
+
 networks:
     jp_network:
         name: jp_network
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 172.18.0.0/16
