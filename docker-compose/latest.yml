@@ -1,0 +1,78 @@
+version: '3.6'
+services:
+    config:
+        build:
+            context: ./config
+            dockerfile: Dockerfile
+        image: config:1.0
+        container_name: "config"
+        networks:
+            - jp_network
+        ports:
+            - 8888:8888
+        hostname: config
+
+    discovery:
+        build:
+            context: ./discovery
+            dockerfile: Dockerfile
+        image: discovery:1.0
+        container_name: "discovery"
+        networks:
+            - jp_network
+        restart: always
+        ports:
+            - 4000:4000
+        hostname: discovery
+
+    add:
+        build:
+            context: ./add
+            dockerfile: Dockerfile
+        image: add:1.0
+        container_name: "add"
+        restart: always
+        networks:
+            - jp_network
+        depends_on:
+            - "config"
+            - "discovery"
+        ports:
+            - 4001:4001
+        hostname: add
+
+    multi:
+        build:
+            context: ./multi
+            dockerfile: Dockerfile
+        image: multi:1.0
+        container_name: "multi"
+        restart: always
+        networks:
+            - jp_network
+        ports:
+            - 4002:4002
+        depends_on:
+            - "config"
+            - "discovery"
+        hostname: multi
+
+    proxy:
+        build:
+            context: ./proxy
+            dockerfile: Dockerfile
+        image: proxy:1.0
+        container_name: "proxy"
+        restart: always
+        networks:
+            - jp_network
+        ports:
+            - 5000:5000
+        depends_on:
+            - "config"
+            - "discovery"
+        hostname: proxy
+
+networks:
+    jp_network:
+        name: jp_network

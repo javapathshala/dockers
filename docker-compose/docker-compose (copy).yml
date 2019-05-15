@@ -1,0 +1,45 @@
+version: '3.0'
+services:
+    config-service:
+        environment:
+            CONFIG_SERVICE_PASSWORD: admin@1
+        build: config
+        ports:
+            - 8888:8888
+        restart: always
+  
+    discovery-service:
+        build: discovery
+        ports:
+            - 4000:4000
+        restart: always        
+
+    add-service:
+        environment:
+            CONFIG_SERVICE_PASSWORD: admin@1
+        build: add
+        depends_on:
+            - config-service            
+        ports:
+            - 4001:4001
+        restart: always                
+
+    multi-service:
+        environment:
+            CONFIG_SERVICE_PASSWORD: admin@1
+        build: multi
+        depends_on:
+            - config-service            
+        ports:
+            - 4002:4002
+        restart: always                
+
+    gateway:
+        environment:
+            CONFIG_SERVICE_PASSWORD: admin@1
+        build: proxy
+        depends_on:
+            - config-service            
+        ports:
+            - 5000:5000
+        restart: always                
